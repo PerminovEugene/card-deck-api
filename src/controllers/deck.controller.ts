@@ -1,15 +1,19 @@
+import {service} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {get, getModelSchemaRef, post, requestBody} from '@loopback/rest';
 import {Deck} from '../models';
 import {DeckRepository} from '../repositories';
+import {DeckService} from '../services';
 
 export class DeckController {
   constructor(
     @repository(DeckRepository)
     public deckRepository: DeckRepository,
+    @service(DeckService)
+    public deckService: DeckService,
   ) {}
 
-  @post('/decks', {
+  @post('/create', {
     responses: {
       '200': {
         description: 'New deck is created',
@@ -23,12 +27,12 @@ export class DeckController {
         'application/json': {
           schema: getModelSchemaRef(Deck, {
             title: 'NewDeck',
-            exclude: ['id'],
+            // exclude: ['uuid'],
           }),
         },
       },
     })
-    deck: Omit<Deck, 'id'>,
+    deck: Deck,
   ): Promise<Deck> {
     // if (todo.remindAtAddress) {
     // ignoring because if the service is down, the following section will
@@ -41,7 +45,7 @@ export class DeckController {
     // );
     // }
     // }
-    return this.deckRepository.create(deck);
+    return this.deckService.createDeck(deck);
   }
 
   @get('/decks', {
@@ -57,8 +61,8 @@ export class DeckController {
       content: {
         'application/json': {
           schema: getModelSchemaRef(Deck, {
-            title: 'NewDeck',
-            exclude: ['id'],
+            title: 'OpenDeck',
+            // exclude: ['uuid'],
           }),
         },
       },

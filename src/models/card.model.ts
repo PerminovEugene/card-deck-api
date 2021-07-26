@@ -17,15 +17,21 @@ export const MAX_RANK = 10;
 export const CARDS_COUNT = 52;
 export const TAG = 'french';
 
-@model()
+@model({
+  settings: {postgresql: {schema: 'public', table: 'card'}},
+})
 export class Card extends Entity {
+  constructor(data?: Partial<Card>) {
+    super(data);
+  }
+
   @property({
     type: 'string',
     id: true,
     generated: false,
     required: true,
     postgresql: {
-      dataType: 'VARCHAR(2)',
+      dataType: 'varchar(2)',
     },
   })
   code: string;
@@ -52,9 +58,10 @@ export class Card extends Entity {
   })
   tags?: string[];
 
-  constructor(data?: Partial<Card>) {
-    super(data);
-  }
+  // @hasMany(() => Deck, {
+  //   through: {model: () => DeckCard, keyTo: 'deckUuid', keyFrom: 'cardCode'},
+  // })
+  // decks?: Deck[];
 }
 
 export interface CardRelations {

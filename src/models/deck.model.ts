@@ -1,15 +1,10 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, hasMany, model, property} from '@loopback/repository';
+import {DeckCard} from './deck-card.model';
 
 @model({
   settings: {postgresql: {schema: 'public', table: 'deck'}},
 })
 export class Deck extends Entity {
-  // Define well-known properties here
-
-  // Indexer property to allow additional data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [prop: string]: any;
-
   constructor(data?: Partial<Deck>) {
     super(data);
   }
@@ -32,7 +27,6 @@ export class Deck extends Entity {
   @property({
     id: true,
     type: 'boolean',
-    defaultFn: 'uuid',
     required: false,
     generated: false,
     jsonSchema: {
@@ -43,6 +37,25 @@ export class Deck extends Entity {
     },
   })
   shuffled: boolean;
+
+  @property({
+    type: 'number',
+    required: false,
+    generated: false,
+    jsonSchema: {
+      type: 'number',
+    },
+    postgresql: {
+      require: true,
+      dataType: 'integer',
+    },
+  })
+  remaining: number;
+
+  @hasMany(() => DeckCard, {
+    through: {model: () => DeckCard, keyFrom: 'deckUuid', keyTo: 'cardCode'},
+  })
+  cards?: DeckCard[];
 
   // @property({
   //   type: 'Date',

@@ -6,6 +6,7 @@ export async function main(options: ApplicationConfig = {}) {
   const app = new CardDeckApiApplication(options);
   await app.boot();
   await app.start();
+  // app.service(DeckService);
 
   const url = app.restServer.url;
   console.log(`Server is running at ${url}`);

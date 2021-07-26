@@ -9,22 +9,44 @@ export class CardRepository extends DefaultCrudRepository<
   typeof Card.prototype.code,
   CardRelations
 > {
-  constructor(@inject('datasources.db') dataSource: DbDataSource) {
+  constructor(
+    @inject('datasources.db') dataSource: DbDataSource,
+    // @repository.getter('DeckRepository')
+    // deckRepositoryGetter: Getter<DeckRepository>,
+    // @repository.getter('DeckCardRepository')
+    // deckCardRepositoryGetter: Getter<DeckCardRepository>,
+  ) {
     super(Card, dataSource);
+    // this.decks = this.createHasManyThroughRepositoryFactoryFor(
+    //   'deck',
+    //   deckRepositoryGetter,
+    //   deckCardRepositoryGetter,
+    // );
   }
 
+  // public readonly decks: HasManyThroughRepositoryFactory<
+  //   Deck,
+  //   typeof Deck.prototype.pid,
+  //   DeckCard,
+  //   typeof Card.prototype.code
+  // >;
+
   public async createFrenchCards() {
-    const frenchCards = await this.find({
-      // Something wrong with working with arrays in connector
-      // types missmatch
-      // broken inq, doesn't work without "{}" wrapper :(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      where: {tags: {inq: [`"{${TAG}}"`] as any}},
-    });
+    const frenchCards = await this.findByTag(TAG);
     if (frenchCards.length === 0) {
       await this.createAll(buildFrenchCardsObjects());
     } else if (frenchCards.length !== CARDS_COUNT) {
       throw new Error('Invalid french cards in count in DB');
     }
+  }
+
+  public async findByTag(tag: string) {
+    return this.find({
+      // Something wrong with working with arrays in connector
+      // types missmatch
+      // broken inq, doesn't work without "{}" wrapper :(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      where: {tags: {inq: [`"{${tag}}"`] as any}},
+    });
   }
 }
