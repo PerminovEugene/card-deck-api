@@ -23,14 +23,14 @@ export class DeckRepository extends DefaultCrudRepository<
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('CardRepository')
-    patientRepositoryGetter: Getter<CardRepository>,
+    cardRepositoryGetter: Getter<CardRepository>,
     @repository.getter('DeckCardRepository')
     deckCardRepositoryGetter: Getter<DeckCardRepository>,
   ) {
     super(Deck, dataSource);
     this.cards = this.createHasManyThroughRepositoryFactoryFor(
       'cards',
-      patientRepositoryGetter,
+      cardRepositoryGetter,
       deckCardRepositoryGetter,
     );
   }

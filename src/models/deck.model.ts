@@ -26,13 +26,12 @@ export class Deck extends Entity {
   uuid: string;
 
   @property({
-    id: true,
     type: 'boolean',
-    required: false,
     generated: false,
     jsonSchema: {
       type: 'boolean',
     },
+    default: true,
     postgresql: {
       dataType: 'boolean',
     },

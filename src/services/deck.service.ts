@@ -19,27 +19,37 @@ export class DeckService {
     public deckCardRepository: DeckCardRepository,
   ) {}
 
-  public async createDeck(deck: Deck): Promise<Deck> {
-    const cards = await this.cardRepository.findByTag(TAG);
-    const deckModel = await this.deckRepository.create({
-      ...deck,
-      remaining: deck.remaining || CARDS_COUNT,
+  public async createDeck(deck: Partial<Deck>): Promise<Deck> {
+    const transaction = await this.deckRepository.dataSource.beginTransaction(
+      IsolationLevel.SERIALIZABLE,
+    );
+    const cards = await this.cardRepository.findByTag(TAG, {
+      transaction,
     });
+    const deckModel = await this.deckRepository.create(
+      {
+        ...deck,
+        remaining: deck.remaining ?? CARDS_COUNT,
+      },
+      {transaction},
+    );
     if (deckModel.shuffled) {
       this.shuffle(cards);
     }
-
     await this.deckCardRepository.createAll(
       cards.slice(0, deckModel.remaining).map(({code}, i) => ({
         cardCode: code,
         deckUuid: deckModel.uuid,
         order: i,
       })),
+      {transaction},
     );
     deckModel.cards = await this.deckCardRepository.getDeckCards(
       deckModel.uuid,
       deckModel.remaining,
+      {transaction},
     );
+    await transaction.commit();
     return deckModel;
   }
 
@@ -66,9 +76,14 @@ export class DeckService {
     if (newRemaining < 0) {
       throw new HttpErrors.BadRequest(`Not enough cards in the deck`);
     }
-    const cards = await this.deckCardRepository.getDeckCards(uuid, count, {
-      transaction,
-    });
+    const cards = await this.deckCardRepository.getTopDeckCards(
+      uuid,
+      deck.remaining,
+      count,
+      {
+        transaction,
+      },
+    );
     deck.remaining = newRemaining;
     await this.deckRepository.updateById(deck.uuid, deck, {transaction});
     await transaction.commit();

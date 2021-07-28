@@ -4,7 +4,11 @@ import {config as parseConfig} from 'dotenv';
 
 // TODO define not by 1 variable
 const envExists = process.env.POSTGRES_PASSWORD;
-const envStorage = envExists ? process.env : parseConfig().parsed;
+const envStorage = envExists
+  ? process.env
+  : parseConfig({
+      path: `./${process.env.NODE_ENV === 'test' ? '.test' : ''}.env`,
+    }).parsed;
 if (!envStorage) {
   throw new Error('Please add required environment variables');
 }

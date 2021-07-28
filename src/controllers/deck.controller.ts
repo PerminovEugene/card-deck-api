@@ -13,33 +13,33 @@ export class DeckController {
     public deckService: DeckService,
   ) {}
 
-  @post('/create', {
+  @post('/deck/create', {
+    requestBodySpec: {
+      description: 'Properties for a new deck',
+      required: false,
+      content: {
+        'application/json': {
+          uuid: {require: false, type: 'uuid', defaultFn: 'uuid'},
+          remaining: {require: false, type: 'number', minValue: 0},
+          shuffled: {require: false, type: 'boolean'},
+        },
+      },
+    },
     responses: {
       '200': {
-        description: 'New deck is created',
+        description: 'New deck',
         content: {'application/json': {schema: getModelSchemaRef(Deck)}},
       },
     },
   })
   async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Deck, {
-            title: 'NewDeck',
-          }),
-        },
-      },
-    })
-    deck: Deck,
+    @requestBody()
+    deck: Partial<Deck>,
   ): Promise<Deck> {
-    // throw new HttpErrors.BadRequest(
-    //   `Address not found: ${deck.remindAtAddress}`,
-    // );
     return this.deckService.createDeck(deck);
   }
 
-  @get('/open', {
+  @get('/deck/open', {
     parameters: [
       {
         name: 'uuid',
@@ -58,13 +58,10 @@ export class DeckController {
     },
   })
   async open(uuid: string): Promise<Deck> {
-    // throw new HttpErrors.BadRequest(
-    //   `Address not found: ${deck.remindAtAddress}`,
-    // );
     return this.deckService.open(uuid);
   }
 
-  @get('/draw', {
+  @get('/deck/draw', {
     parameters: [
       {
         name: 'uuid',

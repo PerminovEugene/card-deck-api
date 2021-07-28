@@ -7,7 +7,6 @@ import {
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
-import path from 'path';
 import {CardRepository} from './repositories';
 import {MySequence} from './sequence';
 
@@ -21,9 +20,6 @@ export class CardDeckApiApplication extends BootMixin(
 
     // Set up the custom sequence
     this.sequence(MySequence);
-
-    // Set up default home page
-    this.static('/', path.join(__dirname, '../public'));
 
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({

@@ -1,9 +1,10 @@
-import {CardDeckApiApplication} from '../..';
 import {
+  Client,
   createRestAppClient,
   givenHttpServerConfig,
-  Client,
 } from '@loopback/testlab';
+import {CardDeckApiApplication} from '../..';
+import {createRepositories} from '../database.helpers';
 
 export async function setupApplication(): Promise<AppWithClient> {
   const restConfig = givenHttpServerConfig({
@@ -23,7 +24,16 @@ export async function setupApplication(): Promise<AppWithClient> {
 
   const client = createRestAppClient(app);
 
+  await cleanDatabase();
+
   return {app, client};
+}
+
+export async function cleanDatabase() {
+  const {deckCardRepository, deckRepository} = createRepositories();
+
+  await deckCardRepository.deleteAll();
+  await deckRepository.deleteAll();
 }
 
 export interface AppWithClient {

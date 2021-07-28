@@ -1,7 +1,20 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model({
-  settings: {postgresql: {schema: 'public', table: 'deckcard'}},
+  settings: {
+    postgresql: {
+      schema: 'public',
+      table: 'deckcard',
+    },
+    foreignKeys: {
+      deckUuid: {
+        name: 'fk_deck_Uuid',
+        entity: 'card',
+        entityKey: 'code',
+        foreignKey: 'cardCode',
+      },
+    },
+  },
 })
 export class DeckCard extends Entity {
   constructor(data?: Partial<DeckCard>) {
@@ -20,7 +33,6 @@ export class DeckCard extends Entity {
     generated: false,
     postgresql: {
       dataType: 'uuid',
-      name: 'deck_uuid',
     },
   })
   deckUuid: string;

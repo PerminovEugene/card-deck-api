@@ -1,5 +1,5 @@
 import {inject} from '@loopback/core';
-import {DefaultCrudRepository} from '@loopback/repository';
+import {DefaultCrudRepository, Options} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
 import {Card, CardRelations, CARDS_COUNT, TAG} from '../models';
 import {buildFrenchCardsObjects} from './card.factory';
@@ -46,13 +46,16 @@ export class CardRepository extends DefaultCrudRepository<
     }
   }
 
-  public async findByTag(tag: string) {
-    return this.find({
-      // Something wrong with working with arrays in connector
-      // types missmatch
-      // broken inq, doesn't work without "{}" wrapper :(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      where: {tags: {inq: [`"{${tag}}"`] as any}},
-    });
+  public async findByTag(tag: string, options?: Options) {
+    return this.find(
+      {
+        // Something wrong with working with arrays in connector
+        // types missmatch
+        // broken inq, doesn't work without "{}" wrapper :(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        where: {tags: {inq: [`"{${tag}}"`] as any}},
+      },
+      options,
+    );
   }
 }

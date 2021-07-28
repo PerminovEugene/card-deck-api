@@ -34,4 +34,25 @@ export class DeckCardRepository extends DefaultCrudRepository<
       options,
     );
   }
+
+  public async getTopDeckCards(
+    deckUuid: string,
+    remainingCards: number,
+    count: number,
+    options?: Options,
+  ): Promise<Card[]> {
+    const reversedDeck = await this.dataSource.execute(
+      `SELECT card.code, card.value, card.suit
+       FROM card
+       INNER JOIN deckcard ON card.code = deckcard.cardCode
+       WHERE deckCard.deckUuid = ($1)
+             AND deckcard.order < ($2)
+       ORDER BY deckcard.order desc
+       LIMIT ($3)
+      `,
+      [deckUuid, remainingCards, count],
+      options,
+    );
+    return reversedDeck.reverse();
+  }
 }
