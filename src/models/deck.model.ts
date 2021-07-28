@@ -1,4 +1,5 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
+import {Card} from './card.model';
 import {DeckCard} from './deck-card.model';
 
 @model({
@@ -52,10 +53,10 @@ export class Deck extends Entity {
   })
   remaining: number;
 
-  @hasMany(() => DeckCard, {
+  @hasMany(() => Card, {
     through: {model: () => DeckCard, keyFrom: 'deckUuid', keyTo: 'cardCode'},
   })
-  cards?: DeckCard[];
+  cards?: Card[];
 
   // @property({
   //   type: 'Date',
@@ -73,7 +74,7 @@ export class Deck extends Entity {
 }
 
 export interface DeckRelations {
-  // describe navigational properties here
+  deckCards: DeckCard;
 }
 
 export type DeckWithRelations = Deck & DeckRelations;

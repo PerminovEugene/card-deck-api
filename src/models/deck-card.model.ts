@@ -25,10 +25,14 @@ export class DeckCard extends Entity {
   })
   deckUuid: string;
 
+  // @belongsTo(() => Deck)
+  // deck: Deck;
+
   @property({
     type: 'string',
+    generated: false,
     postgresql: {
-      dataType: 'varchar(2)',
+      dataType: 'varchar',
       name: 'card_code',
     },
   })
@@ -46,7 +50,8 @@ export class DeckCard extends Entity {
 }
 
 export interface DeckCardRelations {
-  // describe navigational properties here
+  // card: CardWithRelations;
+  // deck: DeckWithRelations;
 }
 
 export type DeckCardWithRelations = DeckCard & DeckCardRelations;

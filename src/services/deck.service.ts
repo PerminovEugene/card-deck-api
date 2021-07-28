@@ -1,6 +1,7 @@
 import {/* inject, */ BindingScope, injectable} from '@loopback/core';
-import {repository} from '@loopback/repository';
-import {CARDS_COUNT, Deck, DeckWithRelations, TAG} from '../models';
+import {IsolationLevel, repository} from '@loopback/repository';
+import {HttpErrors} from '@loopback/rest';
+import {Card, CARDS_COUNT, Deck, TAG} from '../models';
 import {
   CardRepository,
   DeckCardRepository,
@@ -18,7 +19,7 @@ export class DeckService {
     public deckCardRepository: DeckCardRepository,
   ) {}
 
-  public async createDeck(deck: Deck): Promise<DeckWithRelations> {
+  public async createDeck(deck: Deck): Promise<Deck> {
     const cards = await this.cardRepository.findByTag(TAG);
     const deckModel = await this.deckRepository.create({
       ...deck,
@@ -28,15 +29,50 @@ export class DeckService {
       this.shuffle(cards);
     }
 
-    const deckCards = await this.deckCardRepository.createAll(
+    await this.deckCardRepository.createAll(
       cards.slice(0, deckModel.remaining).map(({code}, i) => ({
         cardCode: code,
         deckUuid: deckModel.uuid,
         order: i,
       })),
     );
-    deckModel.cards = deckCards;
+    deckModel.cards = await this.deckCardRepository.getDeckCards(
+      deckModel.uuid,
+      deckModel.remaining,
+    );
     return deckModel;
+  }
+
+  public async open(uuid: string) {
+    const deck = await this.deckRepository.findById(uuid);
+    deck.cards = await this.deckCardRepository.getDeckCards(
+      deck.uuid,
+      deck.remaining,
+    );
+    return deck;
+  }
+
+  public async draw(uuid: string, count: number): Promise<{cards: Card[]}> {
+    const transaction = await this.deckRepository.dataSource.beginTransaction(
+      IsolationLevel.SERIALIZABLE,
+    );
+    const deck = await this.deckRepository.findById(uuid, undefined, {
+      transaction,
+    });
+    if (!deck) {
+      throw new HttpErrors.NotFound(`Deck with uuid ${uuid} is not found`);
+    }
+    const newRemaining = deck.remaining - count;
+    if (newRemaining < 0) {
+      throw new HttpErrors.BadRequest(`Not enough cards in the deck`);
+    }
+    const cards = await this.deckCardRepository.getDeckCards(uuid, count, {
+      transaction,
+    });
+    deck.remaining = newRemaining;
+    await this.deckRepository.updateById(deck.uuid, deck, {transaction});
+    await transaction.commit();
+    return {cards};
   }
 
   // Fisher-Yates shuffle algorithm

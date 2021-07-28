@@ -57,11 +57,6 @@ export class Card extends Entity {
     },
   })
   tags?: string[];
-
-  // @hasMany(() => Deck, {
-  //   through: {model: () => DeckCard, keyTo: 'deckUuid', keyFrom: 'cardCode'},
-  // })
-  // decks?: Deck[];
 }
 
 export interface CardRelations {

@@ -17,6 +17,12 @@ export class CardRepository extends DefaultCrudRepository<
     // deckCardRepositoryGetter: Getter<DeckCardRepository>,
   ) {
     super(Card, dataSource);
+    // this.deckCards = this.createHasManyRepositoryFactoryFor(
+    //   'todos',
+    //   todoRepositoryGetter,
+    // );
+
+    // this.registerInclusionResolver('todos', this.todos.inclusionResolver);
     // this.decks = this.createHasManyThroughRepositoryFactoryFor(
     //   'deck',
     //   deckRepositoryGetter,
