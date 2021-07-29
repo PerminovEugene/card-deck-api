@@ -37,9 +37,6 @@ export class DeckCard extends Entity {
   })
   deckUuid: string;
 
-  // @belongsTo(() => Deck)
-  // deck: Deck;
-
   @property({
     type: 'string',
     generated: false,
@@ -61,9 +58,6 @@ export class DeckCard extends Entity {
   order: number;
 }
 
-export interface DeckCardRelations {
-  // card: CardWithRelations;
-  // deck: DeckWithRelations;
-}
+export interface DeckCardRelations {}
 
 export type DeckCardWithRelations = DeckCard & DeckCardRelations;

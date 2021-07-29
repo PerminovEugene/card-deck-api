@@ -49,6 +49,10 @@ export class Card extends Entity {
   })
   value: string;
 
+  // This field was added for cards presets management
+  // If want to use not only french decks, but decks with 36 cards (cards 2-5 are excluded)
+  // or decks with jokers or custom decks, or even custom cards with new ranks or suit
+  // we can add new tags and add tag property into deck management requests
   @property({
     type: 'array',
     itemType: 'string',
@@ -59,8 +63,6 @@ export class Card extends Entity {
   tags?: string[];
 }
 
-export interface CardRelations {
-  // describe navigational properties here
-}
+export interface CardRelations {}
 
 export type CardWithRelations = Card & CardRelations;

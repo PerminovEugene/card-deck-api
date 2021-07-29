@@ -14,26 +14,33 @@ export class DeckController {
   ) {}
 
   @post('/deck/create', {
-    requestBodySpec: {
-      description: 'Properties for a new deck',
-      required: false,
-      content: {
-        'application/json': {
-          uuid: {require: false, type: 'uuid', defaultFn: 'uuid'},
-          remaining: {require: false, type: 'number', minValue: 0},
-          shuffled: {require: false, type: 'boolean'},
-        },
-      },
-    },
     responses: {
       '200': {
-        description: 'New deck',
-        content: {'application/json': {schema: getModelSchemaRef(Deck)}},
+        description: 'New deck. Bottom cars are first, top cards are last',
+        content: {
+          'application/json': {
+            schema: getModelSchemaRef(Deck, {
+              includeRelations: true,
+              // TODO hide tags property, hide in model doesn't work in this case
+            }),
+          },
+        },
       },
     },
   })
   async create(
-    @requestBody()
+    @requestBody({
+      description: 'Create a new deck',
+      required: false,
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Deck, {
+            title: 'Configuration of deck creation',
+            optional: ['uuid', 'remaining', 'shuffled'],
+          }),
+        },
+      },
+    })
     deck: Partial<Deck>,
   ): Promise<Deck> {
     return this.deckService.createDeck(deck);
@@ -53,7 +60,14 @@ export class DeckController {
     responses: {
       '200': {
         description: 'Open entire deck',
-        content: {'application/json': {schema: getModelSchemaRef(Deck)}},
+        content: {
+          'application/json': {
+            schema: getModelSchemaRef(Deck, {
+              title: 'Entire deck with cards. The top card is the last',
+              includeRelations: true,
+            }),
+          },
+        },
       },
     },
   })
@@ -62,6 +76,7 @@ export class DeckController {
   }
 
   @get('/deck/draw', {
+    description: 'Draw 1 or several cards from the top of the deck',
     parameters: [
       {
         name: 'uuid',
@@ -74,7 +89,7 @@ export class DeckController {
       {
         name: 'count',
         schema: {
-          type: 'number',
+          type: 'integer',
           minimum: 1,
           maximum: CARDS_COUNT,
         },
@@ -83,12 +98,14 @@ export class DeckController {
     ],
     responses: {
       '200': {
-        description: 'Drawed cards',
+        description: 'Drawed cards. Top card in the end',
         content: {
           'application/json': {
             schema: {
               type: 'array',
-              cards: getModelSchemaRef(Card),
+              cards: getModelSchemaRef(Card, {
+                exclude: ['tags'],
+              }),
             },
           },
         },

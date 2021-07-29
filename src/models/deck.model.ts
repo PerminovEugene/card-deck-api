@@ -56,20 +56,6 @@ export class Deck extends Entity {
     through: {model: () => DeckCard, keyFrom: 'deckUuid', keyTo: 'cardCode'},
   })
   cards?: Card[];
-
-  // @property({
-  //   type: 'Date',
-  //   required: true,
-  //   postgresql: {
-  //     columnName: 'created_at',
-  //     dataType: 'TIMESTAMP WITH TIME ZONE',
-  //     dataLength: null,
-  //     dataPrecision: null,
-  //     dataScale: 0,
-  //     nullable: 'NO',
-  //   },
-  // })
-  // createdAt: Date;
 }
 
 export interface DeckRelations {

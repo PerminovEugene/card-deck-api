@@ -9,33 +9,9 @@ export class CardRepository extends DefaultCrudRepository<
   typeof Card.prototype.code,
   CardRelations
 > {
-  constructor(
-    @inject('datasources.db') dataSource: DbDataSource,
-    // @repository.getter('DeckRepository')
-    // deckRepositoryGetter: Getter<DeckRepository>,
-    // @repository.getter('DeckCardRepository')
-    // deckCardRepositoryGetter: Getter<DeckCardRepository>,
-  ) {
+  constructor(@inject('datasources.db') dataSource: DbDataSource) {
     super(Card, dataSource);
-    // this.deckCards = this.createHasManyRepositoryFactoryFor(
-    //   'todos',
-    //   todoRepositoryGetter,
-    // );
-
-    // this.registerInclusionResolver('todos', this.todos.inclusionResolver);
-    // this.decks = this.createHasManyThroughRepositoryFactoryFor(
-    //   'deck',
-    //   deckRepositoryGetter,
-    //   deckCardRepositoryGetter,
-    // );
   }
-
-  // public readonly decks: HasManyThroughRepositoryFactory<
-  //   Deck,
-  //   typeof Deck.prototype.pid,
-  //   DeckCard,
-  //   typeof Card.prototype.code
-  // >;
 
   public async createFrenchCards() {
     const frenchCards = await this.findByTag(TAG);
