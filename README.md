@@ -96,4 +96,4 @@ you also can run tests from vscode for debug
 
 ## You can find API spec on
 
-localhost:3000/
+localhost:3000/explorer
