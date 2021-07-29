@@ -1,13 +1,13 @@
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
+import {RepositoryMixin, SchemaMigrationOptions} from '@loopback/repository';
+import {RestApplication} from '@loopback/rest';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
-import {RepositoryMixin} from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
-import path from 'path';
+import {CardRepository} from './repositories';
 import {MySequence} from './sequence';
 
 export {ApplicationConfig};
@@ -20,9 +20,6 @@ export class CardDeckApiApplication extends BootMixin(
 
     // Set up the custom sequence
     this.sequence(MySequence);
-
-    // Set up default home page
-    this.static('/', path.join(__dirname, '../public'));
 
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({
@@ -40,5 +37,12 @@ export class CardDeckApiApplication extends BootMixin(
         nested: true,
       },
     };
+  }
+
+  async migrateSchema(options?: SchemaMigrationOptions) {
+    await super.migrateSchema(options);
+
+    const cardRepository = await this.getRepository(CardRepository);
+    await cardRepository.createFrenchCards();
   }
 }

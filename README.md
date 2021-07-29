@@ -1,32 +1,36 @@
 # card-deck-api
 
-This application is generated using [LoopBack 4 CLI](https://loopback.io/doc/en/lb4/Command-line-interface.html) with the
-[initial project layout](https://loopback.io/doc/en/lb4/Loopback-application-layout.html).
+Simple server for card decks management.
+Now it supports only french deck without jokers.
 
-## Install dependencies
+## Run the application
 
-By default, dependencies were installed when this application was generated.
-Whenever dependencies in `package.json` are changed, run the following command:
+1. Create .env file and fill it by .env.template
+2. Launch postgres db in docker
+
+```sh
+docker-compose -f docker-compose.yml up -d
+```
+
+3. Install dependencies
 
 ```sh
 npm install
 ```
 
-To only install resolved dependencies in `package-lock.json`:
+4. Run migration
 
 ```sh
-npm ci
+npm run migrate
 ```
 
-## Run the application
+5. Launch server
 
 ```sh
 npm start
 ```
 
-You can also run `node .` to skip the build step.
-
-Open http://127.0.0.1:3000 in your browser.
+or from vscode launcher if you want to debug
 
 ## Rebuild the project
 
@@ -61,15 +65,35 @@ npm run lint:fix
 - `npm run docker:build`: Build a Docker image for this application
 - `npm run docker:run`: Run this application inside a Docker container
 
-## Tests
+## Run Tests
+
+1. Create .test.env file and fill it by .env.template
+2. Launch postgres test db in docker
 
 ```sh
-npm test
+docker-compose -f docker-compose.test.yml up -d
 ```
 
-## What's next
+3. Install dependencies if you aren't install them before
 
-Please check out [LoopBack 4 documentation](https://loopback.io/doc/en/lb4/) to
-understand how you can continue to add features to this application.
+```sh
+npm install
+```
 
-[![LoopBack](https://github.com/loopbackio/loopback-next/raw/master/docs/site/imgs/branding/Powered-by-LoopBack-Badge-(blue)-@2x.png)](http://loopback.io/)
+4. Run migration
+
+```sh
+NODE_ENV=test npm run migrate
+```
+
+5. Run tests
+
+```sh
+NODE_ENV=test npm test
+```
+
+you also can run tests from vscode for debug
+
+## You can find API spec on
+
+localhost:3000/
