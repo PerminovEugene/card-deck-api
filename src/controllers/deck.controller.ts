@@ -1,7 +1,7 @@
 import {service} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {get, getModelSchemaRef, post, requestBody} from '@loopback/rest';
-import {Card, Deck} from '../models';
+import {Card, CARDS_COUNT, Deck} from '../models';
 import {DeckRepository} from '../repositories';
 import {DeckService} from '../services';
 
@@ -75,6 +75,8 @@ export class DeckController {
         name: 'count',
         schema: {
           type: 'number',
+          minimum: 1,
+          maximum: CARDS_COUNT,
         },
         in: 'query',
       },

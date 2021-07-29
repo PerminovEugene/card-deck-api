@@ -1,29 +1,36 @@
 # card-deck-api
 
-## Install dependencies
+Simple server for card decks management.
+Now it supports only french deck without jokers.
 
-By default, dependencies were installed when this application was generated.
-Whenever dependencies in `package.json` are changed, run the following command:
+## Run the application
+
+1. Create .env file and fill it by .env.template
+2. Launch postgres db in docker
+
+```sh
+docker-compose -f docker-compose.yml up -d
+```
+
+3. Install dependencies
 
 ```sh
 npm install
 ```
 
-To only install resolved dependencies in `package-lock.json`:
+4. Run migration
 
 ```sh
-npm ci
+npm run migrate
 ```
 
-## Run the application
+5. Launch server
 
 ```sh
 npm start
 ```
 
-You can also run `node .` to skip the build step.
-
-Open http://127.0.0.1:3000 in your browser.
+or from vscode launcher if you want to debug
 
 ## Rebuild the project
 
@@ -58,10 +65,35 @@ npm run lint:fix
 - `npm run docker:build`: Build a Docker image for this application
 - `npm run docker:run`: Run this application inside a Docker container
 
-## Tests
+## Run Tests
+
+1. Create .test.env file and fill it by .env.template
+2. Launch postgres test db in docker
+
+```sh
+docker-compose -f docker-compose.test.yml up -d
+```
+
+3. Install dependencies if you aren't install them before
+
+```sh
+npm install
+```
+
+4. Run migration
+
+```sh
+NODE_ENV=test npm run migrate
+```
+
+5. Run tests
 
 ```sh
 NODE_ENV=test npm test
 ```
 
-you also need to setup .test.env file and launch docker image
+you also can run tests from vscode for debug
+
+## You can find API spec on
+
+localhost:3000/

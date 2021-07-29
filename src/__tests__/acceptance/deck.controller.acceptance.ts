@@ -1,4 +1,5 @@
 import {Client, expect} from '@loopback/testlab';
+import {v4 as uuidv4} from 'uuid';
 import {CardDeckApiApplication} from '../..';
 import {CARDS_COUNT} from '../../models';
 import {givenDeck} from '../database.helpers';
@@ -26,7 +27,7 @@ describe('DeckController', () => {
     const {body} = await client
       .post('/deck/create')
       .send({
-        uuid: '123e4567-e89b-12d3-a456-426614174000',
+        uuid: uuidv4(),
       })
       .expect(200);
     expect(body).to.containEql({shuffled: true});
@@ -60,7 +61,7 @@ describe('DeckController', () => {
     const {uuid, cards} = await givenDeck({
       shuffled: false,
       remaining,
-      uuid: '123e4567-e89b-12d3-a456-426614174001',
+      uuid: uuidv4(),
     });
 
     const {body} = await client
@@ -77,7 +78,7 @@ describe('DeckController', () => {
   it('invokes GET /deck/open method, check cards order', async () => {
     const {uuid, cards} = await givenDeck({
       shuffled: true,
-      uuid: '123e4567-e89b-12d3-a456-426614174002',
+      uuid: uuidv4(),
     });
 
     const {body} = await client
@@ -91,9 +92,18 @@ describe('DeckController', () => {
     expect(body).to.containEql({uuid});
   });
 
+  it('invokes GET /deck/open method with invalid uuid', async () => {
+    await client
+      .get('/deck/open')
+      .query({
+        uuid: uuidv4(),
+      })
+      .expect(404);
+  });
+
   it('invokes GET /deck/draw method, check cards order', async () => {
     const {uuid, cards} = await givenDeck({
-      uuid: '123e4567-e89b-12d3-a456-426614174003',
+      uuid: uuidv4(),
       shuffled: true,
     });
     const count = 5;
@@ -111,10 +121,10 @@ describe('DeckController', () => {
 
   it('invokes GET /deck/draw 52 times, should draw entire deck', async () => {
     const {uuid, cards} = await givenDeck({
-      uuid: '123e4567-e89b-12d3-a456-426614174004',
+      uuid: uuidv4(),
       shuffled: true,
     });
-    for (let i = 0; i < 52; i++) {
+    for (let i = 0; i < CARDS_COUNT; i++) {
       const {body} = await client
         .get('/deck/draw')
         .query({
@@ -124,5 +134,50 @@ describe('DeckController', () => {
         .expect(200);
       expect(body).to.containEql({cards: [cards?.pop()]});
     }
+  });
+
+  it('invokes GET /deck/draw on a empty deck, should return empty cards array', async () => {
+    const {uuid} = await givenDeck({
+      uuid: uuidv4(),
+      shuffled: true,
+      remaining: 1,
+    });
+    await client.get('/deck/draw').query({
+      uuid: uuid,
+      count: 1,
+    });
+
+    await client
+      .get('/deck/draw')
+      .query({
+        uuid: uuid,
+        count: 1,
+      })
+      .expect(400);
+  });
+
+  it('invokes GET /deck/draw with invalid count, should return error', async () => {
+    const uuid = uuidv4();
+    await client
+      .get('/deck/draw')
+      .query({
+        uuid,
+        count: 0,
+      })
+      .expect(400);
+    await client
+      .get('/deck/draw')
+      .query({
+        uuid,
+        count: -1,
+      })
+      .expect(400);
+    await client
+      .get('/deck/draw')
+      .query({
+        uuid,
+        count: 10000,
+      })
+      .expect(400);
   });
 });
